@@ -2,20 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\EmployeeType;
 use App\Filters\SuperiorFilter;
 use App\Filters\PositionFilter;
 use App\Http\Resources\EmployeeCollection;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Employee;
+use App\Services\EmployeeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Pricecurrent\LaravelEloquentFilters\EloquentFilters;
 
 class EmployeeController extends Controller
 {
-    public function index(Request $request)
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
+    public function index(Request $request): EmployeeCollection
     {
         $filters = EloquentFilters::make([
-            new PositionFilter($request->position_name, $request->position_id)
+            new PositionFilter($request->position_type)
         ]);
 
         $employees = Employee::filter($filters)->paginate();
@@ -32,19 +41,50 @@ class EmployeeController extends Controller
 
         return new EmployeeResource($employee);
     }
-    public function create()
+    public function create(Request $request): EmployeeResource
     {
+        $this->validate($request, [
+            'name' => 'required',
+            'start_date' => 'required|date_format:Y-m-d H:i',
+            'end_date' => 'date_format:Y-m-d H:i',
+            'superior_id' => 'exists:employees,id',
+            'position_type' => Rule::in([EmployeeType::MANAGER, EmployeeType::WORKER]),
+        ]);
 
+        $employee = new Employee();
+
+        (new EmployeeService($employee))->updateOrCreate($request);
+
+        return new EmployeeResource($employee);
     }
-    public function update()
+    public function update(Request $request, $id)
     {
+        $this->validate($request, [
+            'name' => 'required',
+            'start_date' => 'required|date_format:Y-m-d H:i',
+            'end_date' => 'date_format:Y-m-d H:i',
+            'superior_id' => 'exists:employees,id',
+            'position_type' => Rule::in([EmployeeType::MANAGER, EmployeeType::WORKER]),
+        ]);
 
+        $employee = Employee::find($id);
+
+        // Check for not assign self superior
+        if ($employee->id == $request->superior_id) {
+            abort(422, 'Unable to assign superior');
+        }
+
+        (new EmployeeService($employee))->updateOrCreate($request);
+
+        return new EmployeeResource($employee);
     }
-    public function delete()
+    public function delete($id): JsonResponse
     {
+        Employee::destroy($id);
 
+        return response()->json();
     }
-    public function subordinates($id)
+    public function subordinates($id): EmployeeCollection
     {
         $employee = Employee::find($id);
 
@@ -53,8 +93,8 @@ class EmployeeController extends Controller
             abort(404);
         }
         // Check if is manager
-        if (!$employee->position->is_manager) {
-            abort(403, 'Unauthorized action.');
+        if ($employee->position_id != EmployeeType::MANAGER) {
+            abort(403);
         }
 
         $filters = EloquentFilters::make([

@@ -9,3 +9,5 @@ RUN php -r "readfile('http://getcomposer.org/installer');" | php -- --install-di
 COPY . .
 
 RUN composer install
+
+

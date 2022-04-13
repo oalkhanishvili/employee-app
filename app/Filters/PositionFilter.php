@@ -8,26 +8,17 @@ use Illuminate\Database\Eloquent\Builder;
 class PositionFilter extends AbstractEloquentFilter
 {
     protected $name;
-    protected $id;
+    protected $type;
 
-    public function __construct($name, $id)
+    public function __construct($type)
     {
-        $this->name = $name;
-        $this->id = $id;
+        $this->type = $type;
     }
 
     public function apply(Builder $query): Builder
     {
-        if ($this->id) {
-            return $query->whereHas('position', function ($query) {
-                $query->where('id', $this->id);
-            });
-        }
-
-        if ($this->name) {
-            return $query->whereHas('position', function ($query) {
-                $query->where('name', 'like', "%{$this->name}%");
-            });
+        if ($this->type) {
+            $query->where('position_type', $this->type);
         }
 
         return $query;

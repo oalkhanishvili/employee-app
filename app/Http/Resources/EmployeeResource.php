@@ -11,7 +11,7 @@ class EmployeeResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'position' => new PositionResource($this->position),
+            'position_type' => $this->position_type,
             'startDate' => $this->start_date,
             'endDate' => $this->when($this->end_date, $this->end_date),
         ];

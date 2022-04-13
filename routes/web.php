@@ -13,12 +13,29 @@
 |
 */
 
+use Illuminate\Support\Facades\Route;
+
 $router->get('/', function () use ($router) {
+    return view('documentation');
+});
+
+
+
+Route::group([
+    'prefix' => 'api'
+
+], function ($router) {
+    Route::post('login', 'AuthController@login');
+    Route::post('logout', 'AuthController@logout');
+    Route::post('refresh', 'AuthController@refresh');
+    Route::post('me', 'AuthController@me');
+
+
+    Route::get('employees', 'EmployeeController@index');
+    Route::get('employees/{id}', 'EmployeeController@show');
+    Route::get('employees/{id}/subordinates', 'EmployeeController@subordinates');
+    Route::post('employees', 'EmployeeController@create');
+    Route::put('employees/{id}', 'EmployeeController@update');
+    Route::delete('employees/{id}', 'EmployeeController@delete');
 
 });
-$router->get('employees', 'EmployeeController@index');
-$router->get('employees/{id}', 'EmployeeController@show');
-$router->get('employees/{id}/subordinates', 'EmployeeController@subordinates');
-$router->post('employees', 'EmployeeController@create');
-$router->put('employees', 'EmployeeController@update');
-$router->delete('employees/{id}', 'EmployeeController@delete');
