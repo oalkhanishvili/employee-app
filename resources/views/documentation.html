@@ -701,8 +701,9 @@
                 "type" : "string",
                 "example" : "Jon Doe"
             },
-            "position" : {
-                "$ref" : "#/components/schemas/Employee_position"
+            "position_type" : {
+                "type" : "integer",
+                "enum" : [ 1, 2 ]
             },
             "startDate" : {
                 "pattern" : "YYYY-MM-DD",
@@ -717,21 +718,6 @@
                 "format" : "date"
             }
         }
-    };
-    defs["Employee_position"] = {
-        "type" : "object",
-        "properties" : {
-            "id" : {
-                "type" : "integer",
-                "format" : "int64"
-            },
-            "name" : {
-                "type" : "string",
-                "description" : "Position name",
-                "example" : "Manager"
-            }
-        },
-        "example" : null
     };
     defs["Error"] = {
         "required" : [ "code", "message" ],
@@ -795,9 +781,9 @@
                 "type" : "integer",
                 "format" : "int64"
             },
-            "position_id" : {
+            "position_type" : {
                 "type" : "integer",
-                "format" : "int64"
+                "enum" : [ 1, 2 ]
             },
             "start_date" : {
                 "pattern" : "YYYY-MM-DD",
@@ -908,7 +894,7 @@
                            <pre class="prettyprint"><code class="language-bsh">curl -X POST\
 -H "Accept: application/json"\
 -H "Content-Type: application/json"\
-"http://exam:8888/api/login"</code></pre>
+"http://localhost:8000/api/login"</code></pre>
                                 </div>
                                 <div class="tab-pane" id="examples-Auth-authUser-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
@@ -1272,7 +1258,7 @@ except ApiException as e:
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
 -H "Content-Type: application/json"\
-"http://exam:8888/api/employees"</code></pre>
+"http://localhost:8000/api/employees"</code></pre>
                                 </div>
                                 <div class="tab-pane" id="examples-Employee-createEmployee-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
@@ -1645,7 +1631,7 @@ except ApiException as e:
                            <pre class="prettyprint"><code class="language-bsh">curl -X DELETE\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
-"http://exam:8888/api/employees/{id}"</code></pre>
+"http://localhost:8000/api/employees/{id}"</code></pre>
                                 </div>
                                 <div class="tab-pane" id="examples-Employee-deleteEmployee-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
@@ -2006,7 +1992,7 @@ except ApiException as e:
                            <pre class="prettyprint"><code class="language-bsh">curl -X GET\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
-"http://exam:8888/api/employees?position_name=&position_id="</code></pre>
+"http://localhost:8000/api/employees?position_type="</code></pre>
                                 </div>
                                 <div class="tab-pane" id="examples-Employee-listEmployee-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
@@ -2024,10 +2010,9 @@ public class EmployeeApiExample {
 
 
         EmployeeApi apiInstance = new EmployeeApi();
-        String positionName = positionName_example; // String | Employee position name
-        Integer positionId = 56; // Integer | Employee position id
+        Integer positionType = 56; // Integer | Employee position type 1 - Manager 2 - Worker
         try {
-            array[Employee] result = apiInstance.listEmployee(positionName, positionId);
+            array[Employee] result = apiInstance.listEmployee(positionType);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling EmployeeApi#listEmployee");
@@ -2044,10 +2029,9 @@ public class EmployeeApiExample {
 
     public static void main(String[] args) {
         EmployeeApi apiInstance = new EmployeeApi();
-        String positionName = positionName_example; // String | Employee position name
-        Integer positionId = 56; // Integer | Employee position id
+        Integer positionType = 56; // Integer | Employee position type 1 - Manager 2 - Worker
         try {
-            array[Employee] result = apiInstance.listEmployee(positionName, positionId);
+            array[Employee] result = apiInstance.listEmployee(positionType);
             System.out.println(result);
         } catch (ApiException e) {
             System.err.println("Exception when calling EmployeeApi#listEmployee");
@@ -2062,14 +2046,12 @@ public class EmployeeApiExample {
   </div> -->
                                 <div class="tab-pane" id="examples-Employee-listEmployee-0-objc">
                               <pre class="prettyprint"><code class="language-cpp">Configuration *apiConfig = [Configuration sharedConfig];
-String *positionName = positionName_example; // Employee position name (optional)
-Integer *positionId = 56; // Employee position id (optional)
+Integer *positionType = 56; // Employee position type 1 - Manager 2 - Worker (optional)
 
 EmployeeApi *apiInstance = [[EmployeeApi alloc] init];
 
 // Get all employees with pagination
-[apiInstance listEmployeeWith:positionName
-    positionId:positionId
+[apiInstance listEmployeeWith:positionType
               completionHandler: ^(array[Employee] output, NSError* error) {
                             if (output) {
                                 NSLog(@"%@", output);
@@ -2088,8 +2070,7 @@ var defaultClient = EmployeeApp.ApiClient.instance;
 
 var api = new EmployeeApp.EmployeeApi()
 var opts = {
-  'positionName': positionName_example, // {{String}} Employee position name
-  'positionId': 56 // {{Integer}} Employee position id
+  'positionType': 56 // {{Integer}} Employee position type 1 - Manager 2 - Worker
 };
 var callback = function(error, data, response) {
   if (error) {
@@ -2121,13 +2102,12 @@ namespace Example
 
 
             var apiInstance = new EmployeeApi();
-            var positionName = positionName_example;  // String | Employee position name (optional)
-            var positionId = 56;  // Integer | Employee position id (optional)
+            var positionType = 56;  // Integer | Employee position type 1 - Manager 2 - Worker (optional)
 
             try
             {
                 // Get all employees with pagination
-                array[Employee] result = apiInstance.listEmployee(positionName, positionId);
+                array[Employee] result = apiInstance.listEmployee(positionType);
                 Debug.WriteLine(result);
             }
             catch (Exception e)
@@ -2146,11 +2126,10 @@ require_once(__DIR__ . '/vendor/autoload.php');
 
 
 $api_instance = new Swagger\Client\ApiEmployeeApi();
-$positionName = positionName_example; // String | Employee position name
-$positionId = 56; // Integer | Employee position id
+$positionType = 56; // Integer | Employee position type 1 - Manager 2 - Worker
 
 try {
-    $result = $api_instance->listEmployee($positionName, $positionId);
+    $result = $api_instance->listEmployee($positionType);
     print_r($result);
 } catch (Exception $e) {
     echo 'Exception when calling EmployeeApi->listEmployee: ', $e->getMessage(), PHP_EOL;
@@ -2165,11 +2144,10 @@ use WWW::SwaggerClient::EmployeeApi;
 
 
 my $api_instance = WWW::SwaggerClient::EmployeeApi->new();
-my $positionName = positionName_example; # String | Employee position name
-my $positionId = 56; # Integer | Employee position id
+my $positionType = 56; # Integer | Employee position type 1 - Manager 2 - Worker
 
 eval {
-    my $result = $api_instance->listEmployee(positionName => $positionName, positionId => $positionId);
+    my $result = $api_instance->listEmployee(positionType => $positionType);
     print Dumper($result);
 };
 if ($@) {
@@ -2187,12 +2165,11 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = swagger_client.EmployeeApi()
-positionName = positionName_example # String | Employee position name (optional)
-positionId = 56 # Integer | Employee position id (optional)
+positionType = 56 # Integer | Employee position type 1 - Manager 2 - Worker (optional)
 
 try:
     # Get all employees with pagination
-    api_response = api_instance.list_employee(positionName=positionName, positionId=positionId)
+    api_response = api_instance.list_employee(positionType=positionType)
     pprint(api_response)
 except ApiException as e:
     print("Exception when calling EmployeeApi->listEmployee: %s\n" % e)</code></pre>
@@ -2211,41 +2188,19 @@ except ApiException as e:
                                     <th width="150px">Name</th>
                                     <th>Description</th>
                                 </tr>
-                                <tr><td style="width:150px;">position_name</td>
+                                <tr><td style="width:150px;">position_type</td>
                                     <td>
 
 
-                                        <div id="d2e199_listEmployee_positionName">
-                                            <div class="json-schema-view">
-                                                <div class="primitive">
-                                                <span class="type">
-                                                    String
-                                                </span>
-
-                                                    <div class="inner description">
-                                                        Employee position name
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr><td style="width:150px;">position_id</td>
-                                    <td>
-
-
-                                        <div id="d2e199_listEmployee_positionId">
+                                        <div id="d2e199_listEmployee_positionType">
                                             <div class="json-schema-view">
                                                 <div class="primitive">
                                                 <span class="type">
                                                     Integer
                                                 </span>
-                                                    <span class="format">
-                                                        (int32)
-                                                    </span>
 
                                                     <div class="inner description">
-                                                        Employee position id
+                                                        Employee position type 1 - Manager 2 - Worker
                                                     </div>
                                                 </div>
                                             </div>
@@ -2393,7 +2348,7 @@ except ApiException as e:
                            <pre class="prettyprint"><code class="language-bsh">curl -X GET\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
-"http://exam:8888/api/employees/{id}"</code></pre>
+"http://localhost:8000/api/employees/{id}"</code></pre>
                                 </div>
                                 <div class="tab-pane" id="examples-Employee-showEmployee-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
@@ -2747,7 +2702,7 @@ except ApiException as e:
                            <pre class="prettyprint"><code class="language-bsh">curl -X GET\
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
-"http://exam:8888/api/employees/{id}/subordinates"</code></pre>
+"http://localhost:8000/api/employees/{id}/subordinates"</code></pre>
                                 </div>
                                 <div class="tab-pane" id="examples-Employee-showEmployeeSubordinates-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
@@ -3102,7 +3057,7 @@ except ApiException as e:
  -H "Authorization: Bearer [[accessToken]]"\
 -H "Accept: application/json"\
 -H "Content-Type: application/json"\
-"http://exam:8888/api/employees/{id}"</code></pre>
+"http://localhost:8000/api/employees/{id}"</code></pre>
                                 </div>
                                 <div class="tab-pane" id="examples-Employee-updateEmployee-0-java">
                             <pre class="prettyprint"><code class="language-java">import io.swagger.client.*;
