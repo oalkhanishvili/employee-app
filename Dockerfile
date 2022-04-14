@@ -10,3 +10,6 @@ COPY . .
 
 RUN composer install
 
+CMD "php vendor/bin/codecept run api -v"
+
+
