@@ -27,7 +27,7 @@ class EmployeeService
         $this->model->end_date = $request->end_date;
 
         if ($this->model->save() === false) {
-            abort(401);
+            abort(500, 'Unable to save in database');
         }
 
         return $this->model;
