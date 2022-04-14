@@ -19,8 +19,4 @@ class Employee extends Model
     {
         return $this->hasMany(Employee::class, 'superior_id');
     }
-    public function position(): BelongsTo
-    {
-        return $this->belongsTo(Position::class);
-    }
 }

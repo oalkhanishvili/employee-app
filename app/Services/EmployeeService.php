@@ -26,6 +26,10 @@ class EmployeeService
         $this->model->start_date = $request->start_date;
         $this->model->end_date = $request->end_date;
 
-        $this->model->save();
+        if ($this->model->save() === false) {
+            abort(401);
+        }
+
+        return $this->model;
     }
 }

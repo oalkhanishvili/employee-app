@@ -16,9 +16,19 @@ use Pricecurrent\LaravelEloquentFilters\EloquentFilters;
 
 class EmployeeController extends Controller
 {
+    private $validationRules;
+
     public function __construct()
     {
         $this->middleware('auth:api');
+
+        $this->validationRules = [
+            'name'          => 'required',
+            'start_date'    => 'required|date_format:Y-m-d H:i',
+            'end_date'      => 'date_format:Y-m-d H:i',
+            'superior_id'   => 'exists:employees,id',
+            'position_type' => Rule::in([EmployeeType::MANAGER, EmployeeType::WORKER]),
+        ];
     }
 
     public function index(Request $request): EmployeeCollection
@@ -43,29 +53,15 @@ class EmployeeController extends Controller
     }
     public function create(Request $request): EmployeeResource
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'start_date' => 'required|date_format:Y-m-d H:i',
-            'end_date' => 'date_format:Y-m-d H:i',
-            'superior_id' => 'exists:employees,id',
-            'position_type' => Rule::in([EmployeeType::MANAGER, EmployeeType::WORKER]),
-        ]);
+        $this->validate($request, $this->validationRules);
 
-        $employee = new Employee();
-
-        (new EmployeeService($employee))->updateOrCreate($request);
+        $employee = (new EmployeeService(new Employee()))->updateOrCreate($request);
 
         return new EmployeeResource($employee);
     }
     public function update(Request $request, $id)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'start_date' => 'required|date_format:Y-m-d H:i',
-            'end_date' => 'date_format:Y-m-d H:i',
-            'superior_id' => 'exists:employees,id',
-            'position_type' => Rule::in([EmployeeType::MANAGER, EmployeeType::WORKER]),
-        ]);
+        $this->validate($request, $this->validationRules);
 
         $employee = Employee::find($id);
 
@@ -74,7 +70,7 @@ class EmployeeController extends Controller
             abort(422, 'Unable to assign superior');
         }
 
-        (new EmployeeService($employee))->updateOrCreate($request);
+        $employee = (new EmployeeService($employee))->updateOrCreate($request);
 
         return new EmployeeResource($employee);
     }
